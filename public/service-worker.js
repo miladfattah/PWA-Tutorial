@@ -1,11 +1,14 @@
-let CACHE_VERSION = 1.1; // changes version chches
-let CACHE_CURRENT = {
-    static : `front-cache-v${CACHE_VERSION}`
+//COMEENT
+
+let V_CACHES = 1.03;
+let N_CACHES = {
+    static : `cache-static-v${V_CACHES}`,
+    dynamic : `cache-dynamic-v${V_CACHES}`
 }
 
 self.addEventListener('install' , (e)=>{
     e.waitUntil(
-        caches.open(CACHE_CURRENT['static']).then(cache=>{
+        caches.open(N_CACHES['static']).then(cache=>{
             return cache.addAll(
                 [
                 '/',
@@ -21,23 +24,26 @@ self.addEventListener('install' , (e)=>{
 });
 
 self.addEventListener('activate' , (e)=>{
-    let expressionVersion = Object.values(CACHE_CURRENT);
 
-    console.log('expre ' , expressionVersion);
-    e.waitUntil(
-        caches.keys().then(cacheNames=>{
-            cacheNames.forEach(cacheName=>{
-                if( ! expressionVersion.includes(cacheName)){
-                    caches.delete(cacheName);
-                }
-            })
-        })
-    )
+   let exactedCacheVertion = Object.values(N_CACHES);
+
+   e.waitUntil(
+       caches.keys().then(cacheNames=>{
+ 
+               return cacheNames.forEach(cacheName=>{
+                   if(! cacheName.includes(exactedCacheVertion)){
+                        caches.delete(cacheName);
+                   }
+               })
+          
+       })
+   )
+
 });
 
 self.addEventListener('fetch' , (e)=>{
     e.respondWith(
-        caches.open('front-cashe').then((cache)=>{
+        caches.open(N_CACHES['static']).then((cache)=>{
             return cache.match(e.request).then(response=>{
                 return (
                     response ||
@@ -50,3 +56,19 @@ self.addEventListener('fetch' , (e)=>{
         })
     )
 })
+
+
+// self.addEventListener('fetch' , e=>{
+//     e.respondWith(
+//         caches.match(e.request).then(response=>{
+//             if(response) return response;
+
+//             return fetch(e.request).then(netWorkResponse=>{
+//                 caches.open(N_CACHES['dynamic']).then(cache=>{
+//                     cache.put(e.request , netWorkResponse.clone());
+//                     return netWorkResponse;
+//                 })
+//             })
+//         })
+//     )
+// });
