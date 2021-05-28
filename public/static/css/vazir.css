@@ -6,6 +6,7 @@
          url('../fonts/woff/Vazir.woff') format('woff'),
          url('../fonts/ttf/Vazir.ttf') format('truetype');
     font-weight: normal;
+    font-display: auto;
   }
   
   @font-face {
@@ -16,6 +17,7 @@
          url('../fonts/woff/Vazir-Bold.woff') format('woff'),
          url('../fonts/ttf/Vazir-Bold.ttf') format('truetype');
     font-weight: bold;
+    font-display: auto;
   }
   
   @font-face {
@@ -26,6 +28,7 @@
          url('../fonts/woff/Vazir-Light.woff') format('woff'),
          url('../fonts/ttf/Vazir-Light.ttf') format('truetype');
     font-weight: 300;
+    font-display: auto;
   }
   
   @font-face {
@@ -36,6 +39,7 @@
          url('../fonts/woff/Vazir-Medium.woff') format('woff'),
          url('../fonts/ttf/Vazir-Medium.ttf') format('truetype');
     font-weight: 500;
+    font-display: auto;
   }
   
   @font-face {
@@ -46,4 +50,5 @@
          url('../fonts/woff/Vazir-Thin.woff') format('woff'),
          url('../fonts/ttf/Vazir-Thin.ttf') format('truetype');
     font-weight: 100;
+    font-display: auto;
   }

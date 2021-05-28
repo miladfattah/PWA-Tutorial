@@ -1,74 +1,120 @@
-//COMEENT
-
-let V_CACHES = 1.03;
-let N_CACHES = {
-    static : `cache-static-v${V_CACHES}`,
-    dynamic : `cache-dynamic-v${V_CACHES}`
+let CACHE_V = 2.2;
+let CACHE_CURRENT = {
+    static : `static-cache-v${CACHE_V}`,
+    dynamic : `dynamic-cache-v${CACHE_V}`
 }
 
-self.addEventListener('install' , (e)=>{
+self.addEventListener("install", e=>{
     e.waitUntil(
-        caches.open(N_CACHES['static']).then(cache=>{
-            return cache.addAll(
-                [
-                '/',
-                '/static/css/materialize.min.css',
-                '/static/css/vazir.css',
-                '/static/css/style.css',
-                '/static/js/app.js',
-                '/static/js/materialize.min.js'
-                 ]
-            )
+        caches.open(CACHE_CURRENT['static']).then(cache=>{
+            return cache.addAll([
+                "/",
+                "/offline.html",
+                "/static/css/materialize.min.css",
+                "/static/css/vazir.css",
+                "/static/css/style.css",
+                "/static/js/app.js",
+                "/static/js/materialize.min.js"
+            ])
         })
     )
 });
 
-self.addEventListener('activate' , (e)=>{
+self.addEventListener('activate' , e=>{
+    let exactedCacheVersion = Object.values(CACHE_CURRENT);
 
-   let exactedCacheVertion = Object.values(N_CACHES);
-
-   e.waitUntil(
-       caches.keys().then(cacheNames=>{
- 
-               return cacheNames.forEach(cacheName=>{
-                   if(! cacheName.includes(exactedCacheVertion)){
-                        caches.delete(cacheName);
-                   }
-               })
-          
-       })
-   )
-
-});
-
-self.addEventListener('fetch' , (e)=>{
-    e.respondWith(
-        caches.open(N_CACHES['static']).then((cache)=>{
-            return cache.match(e.request).then(response=>{
-                return (
-                    response ||
-                    fetch(e.request).then( (response)=> {
-                      cache.put(e.request, response.clone());
-                      return response;
-                    })
-                  );
+    e.waitUntil(
+        caches.keys().then(cacheNames=>{
+            return cacheNames.forEach(cacheName =>{
+                if( ! exactedCacheVersion.includes(cacheName)){
+                    caches.delete(cacheName);
+                }
             })
         })
     )
-})
-
+});
 
 // self.addEventListener('fetch' , e=>{
 //     e.respondWith(
-//         caches.match(e.request).then(response=>{
-//             if(response) return response;
+//         caches.open(CACHE_CURRENT['static']).then(cache=>{
+//             return cache.match(e.request).then(response=>{
+//                 return response || fetch(e.request);
+//             })
+//         })
+//     )
+// });
 
-//             return fetch(e.request).then(netWorkResponse=>{
-//                 caches.open(N_CACHES['dynamic']).then(cache=>{
-//                     cache.put(e.request , netWorkResponse.clone());
-//                     return netWorkResponse;
+// // first caches then network
+// self.addEventListener("fetch" , e=>{
+//     e.respondWith(
+//         caches.match(e.request).then(respose=>{
+//             if(respose) return respose;
+
+//             return fetch(e.request)
+//                 .then(networkResonse=>{
+//                 caches.open(CACHE_CURRENT['dynamic']).then(cache =>{
+//                     cache.put(e.request , networkResonse.clone());
+//                     return networkResonse;
 //                 })
 //             })
 //         })
 //     )
 // });
+
+
+// // Network only
+// self.addEventListener('fetch' , e=>{
+//     e.respondWith(
+//         fetch(e.request)
+//     )
+// })
+
+// // caches only
+// self.addEventListener('fetch' , e=>{
+//     e.respondWith(
+//         caches.match(e.request)
+//     )
+// });
+
+// // first network then caches **** for using with feature first delete all caches from chrome and try again ****
+// self.addEventListener('fetch' , e=>{
+//     return e.respondWith(
+//         fetch(e.request)
+//         .then(response=>{
+//             return caches.open(CACHE_CURRENT['dynamic']).then(cache=>{
+//                 cache.put(e.request , response.clone());
+//                 return response;
+//             })
+//         })
+//         .catch(err=>{
+//             return caches.match(e.request);
+//         })
+//     )
+// })
+
+
+// create offline page
+
+self.addEventListener("fetch" , e=>{
+    e.respondWith(
+        caches.match(e.request).then(respose=>{
+            if(respose) return respose;
+
+            return fetch(e.request)
+                .then(networkResonse=>{
+                caches.open(CACHE_CURRENT['dynamic'])
+                .then(cache =>{
+                    cache.put(e.request , networkResonse.clone());
+                    return networkResonse;
+                })
+                .catch(err=>{
+                    return caches.open(CACHE_CURRENT['static'])
+                                .then(cache=>{
+                                    return cache.match('./offline');
+                                })
+                })
+            })
+          
+        })
+    )
+});

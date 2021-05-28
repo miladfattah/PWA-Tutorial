@@ -1,5 +1,13 @@
 if ( 'serviceWorker' in navigator){
-  navigator.serviceWorker.register('/service-worker.js');
+  navigator.serviceWorker.register('/service-worker.js')
+                      .then(registration =>{
+                        registration.addEventListener('updatefound' , ()=>{
+                          
+                          let installingWorker = registration.installing;
+                          console.log('A new service worker is being installed:',
+                          installingWorker);
+                        })
+                      })
 } 
 
 let homeBtn= document.querySelector('.fixed-action-btn a');
@@ -14,7 +22,6 @@ window.addEventListener('beforeinstallprompt', (e) => {
     console.log(`'beforeinstallprompt' event was fired.`);
 });
 
-
 homeBtn.addEventListener('click' ,  async(e)=>{
     e.preventDefault();
     deferredPrompt.prompt();
@@ -24,4 +31,14 @@ homeBtn.addEventListener('click' ,  async(e)=>{
     console.log(`User response to the install prompt: ${outcome}`);
     // We've used the prompt, and can't use it again, throw it away
     deferredPrompt = null;
-})
+});
+
+(async function(){
+  let res = await fetch('https://jsonplaceholder.typicode.com/posts');
+  let data = await res.json();
+
+}())
+
+
+
+
