@@ -33,12 +33,47 @@ homeBtn.addEventListener('click' ,  async(e)=>{
     deferredPrompt = null;
 });
 
-(async function(){
-  let res = await fetch('https://jsonplaceholder.typicode.com/posts');
-  let data = await res.json();
+// (async function(){
+//   let res = await fetch('https://jsonplaceholder.typicode.com/posts');
+//   let data = await res.json();
+//   let products  = Object.values(data);
 
-}())
+//   products.forEach(product => {
+//     getUIproducts(product);
+//   });
+// }());
+fetch('https://jsonplaceholder.typicode.com/posts')
+  .then(res=> res.json())
+  .then(data=>{
+    let products  = Object.values(data);
+    products.forEach(product => {
+          getUIproducts(product);
+        });
+  }).catch(err=>{
+    if( 'indexedDB' in window ){
+      db.products.toArray().then(products=>{
+        products.forEach(product => {
+          getUIproducts(product);
+        });
+      })
+    }
+  })
 
+const getUIproducts= (product)=>{
+    let card = `
+    <div class="col s12 m4">
+      <div class="card">
+        <div class="card-image">
+          <span class="card-title">${product.title}</span>
+        </div>
+        <div class="card-content">
+          <p>${product.body}</p>
+        </div>
+      </div>
+    </div>
+    `;
 
-
+    const products = document.getElementById('products');
+    products.innerHTML += card;
+}
 

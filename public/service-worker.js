@@ -1,4 +1,7 @@
-let CACHE_V = 2.2;
+importScripts("/static/js/dexie.js");
+importScripts("/static/js/db.js");
+
+let CACHE_V = 1.3;
 let CACHE_CURRENT = {
     static : `static-cache-v${CACHE_V}`,
     dynamic : `dynamic-cache-v${CACHE_V}`
@@ -14,7 +17,9 @@ self.addEventListener("install", e=>{
                 "/static/css/vazir.css",
                 "/static/css/style.css",
                 "/static/js/app.js",
-                "/static/js/materialize.min.js"
+                "/static/js/materialize.min.js",
+                "/static/js/dexie.js",
+                "/static/js/db.js"
             ])
         })
     )
@@ -93,28 +98,41 @@ self.addEventListener('activate' , e=>{
 // })
 
 
-// create offline page
+// create offline page and save data to indexedDB
 
 self.addEventListener("fetch" , e=>{
-    e.respondWith(
-        caches.match(e.request).then(respose=>{
-            if(respose) return respose;
-
-            return fetch(e.request)
-                .then(networkResonse=>{
-                caches.open(CACHE_CURRENT['dynamic'])
-                .then(cache =>{
-                    cache.put(e.request , networkResonse.clone());
-                    return networkResonse;
+    let urls = [
+        'https://jsonplaceholder.typicode.com/posts'
+    ];
+    if(urls.indexOf(e.request.url) > -1){
+        e.respondWith(
+             fetch(e.request).then(response=>{
+                let clone = response.clone();
+                clone.json().then(products=>{
+                    products.forEach(product => {
+                        db.products.put(product);
+                    });
                 })
-                .catch(err=>{
-                    return caches.open(CACHE_CURRENT['static'])
-                                .then(cache=>{
-                                    return cache.match('./offline');
-                                })
-                })
+                return response;
             })
-          
-        })
-    )
+        )
+    }else{
+        e.respondWith(
+            caches.match(e.request).then(respose=>{
+                if(respose) return respose;
+    
+                return fetch(e.request)
+                    .then(networkResonse=>{
+                        return caches.open(CACHE_CURRENT['dynamic'])
+                            .then(cache =>{
+                                cache.put(e.request , networkResonse.clone());
+                                return networkResonse;
+                            })
+                    }).catch(err=>{
+                         return caches.match('/offline.html');
+                    })
+              
+            })
+        )
+    }
 });
