@@ -136,3 +136,18 @@ self.addEventListener("fetch" , e=>{
         )
     }
 });
+
+
+self.addEventListener("sync" , function(e){
+    console.log('sync is running ...' , e);
+    if(e.tag == 'task-1'){
+        e.waitUntil(
+            dosomeStuff()
+        )
+    }
+});
+
+
+async function dosomeStuff(){
+    console.log('sync Background')
+}

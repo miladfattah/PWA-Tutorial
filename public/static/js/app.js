@@ -46,8 +46,8 @@ fetch('https://jsonplaceholder.typicode.com/posts')
   .then(res=> res.json())
   .then(data=>{
     let products  = Object.values(data);
-    products.forEach(product => {
-          getUIproducts(product);
+        products.forEach(product => {
+              getUIproducts(product);
         });
   }).catch(err=>{
     if( 'indexedDB' in window ){
@@ -74,6 +74,8 @@ const getUIproducts= (product)=>{
     `;
 
     const products = document.getElementById('products');
-    products.innerHTML += card;
+
+    if(products != undefined)
+      products.innerHTML += card;
 }
 
