@@ -140,14 +140,30 @@ self.addEventListener("fetch" , e=>{
 
 self.addEventListener("sync" , function(e){
     console.log('sync is running ...' , e);
-    if(e.tag == 'task-1'){
+    if(e.tag == 'sync-new-product'){
         e.waitUntil(
-            dosomeStuff()
+            db.syncProducts.toArray().then((syncProducts)=>{
+                console.log("syncProducts... : " , syncProducts);
+                syncProducts.forEach( product=>{
+                    let fd = new FormData();
+                    fd.append('title' , product.title);
+                    fd.append('body', product.body);
+                    fd.append('image', product.image);
+                    fd.append('price', product.price);
+
+                    // fetch('http://localhost:8080/static/js/log.js' , {
+                    //     method : 'POST', 
+                    //     body: JSON.stringify(fd), 
+                        
+                    // })
+
+                    console.log( 'title',fd.get('title'))
+                })
+            })
+
+
         )
     }
 });
 
 
-async function dosomeStuff(){
-    console.log('sync Background')
-}

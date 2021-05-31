@@ -4,8 +4,6 @@ if ( 'serviceWorker' in navigator){
                         registration.addEventListener('updatefound' , ()=>{
                           
                           let installingWorker = registration.installing;
-                          console.log('A new service worker is being installed:',
-                          installingWorker);
                         })
                       })
 } 

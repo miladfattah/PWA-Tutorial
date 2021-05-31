@@ -9,7 +9,7 @@
     <link rel="stylesheet" type="text/css" href="/static/css/materialize.min.css" />
     <link rel="stylesheet" type="text/css" href="/static/css/vazir.css" />    
     <link rel="stylesheet" type="text/css" href="/static/css/style.css" />
-    <link rel="manifest" href="./manifest.json">
+    <link rel="manifest" href="/manifest.json">
     <!-- manifest : apple config -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
@@ -99,23 +99,32 @@
               price = this.querySelector('input[name="price"]');
 
 
-              if( title.value == "" || body.value == ""  || price.value == "" || image.files[0] == undefined){
-                alert("please enter value in inputs");
-                return;
-              }
+          if( title.value == "" || body.value == ""  || price.value == "" || image.files[0] == undefined){
+            alert("please enter value in inputs");
+            return;
+          }
 
           if('serviceWorker' in navigator && 'SyncManager' in window){
               navigator.serviceWorker.ready
-              .then(swRegistration=>{
-                swRegistration.sync.register('task-1')
-                .then(()=>{
-                  console.log('task is register');
+                .then(swRegistration=>{
+                  console.log('put is running ... ');
+                    db.syncProducts.put({
+                      title : title.value,
+                      body : body.value,
+                      image : image.files[0],
+                      price : price.value
+                    }).then(()=>{
+                      console.log('returned sync');
+                      return swRegistration.sync.register('sync-new-product');
+                    }).then(()=>{
+                      console.log("data is success put to data base");
+                    }).catch((err)=>{
+                      console.log('data put is fail : ' ,err);
+                    })
                 })
-                .catch(err => console.log( 'err task :' , err ));
-              })
-            }else{
+          }else{
               console.log('error syn');
-            }
+          }
 
         });
 
