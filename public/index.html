@@ -64,6 +64,12 @@
     <div class="fixed-action-btn">
       <a class="btn-floating btn-large waves-effect waves-light red" href="create.html"><i class="material-icons">add</i></a>
     </div>
+
+
+    
+    <div class="fixed-action-btn left">
+      <a  id="notification" class="btn-floating btn-large waves-effect waves-light darknes-1 blue" href="create.html"><i class="material-icons">notifications</i></a>
+    </div>
               
 
     <script src="./static/js/dexie.js"></script>
@@ -71,10 +77,54 @@
     <script src="./static/js/app.js"></script>
     <script src="/static/js/materialize.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             var elems = document.querySelectorAll('.sidenav');
             var instances = M.Sidenav.init(elems, {});
+
+            const notificationBtn = document.getElementById("notification");
+
+            const deniedStyleBTN = ()=>{
+                notificationBtn.classList.remove('blue');
+                notificationBtn.classList.add('gray');
+                notificationBtn.removeAttribute('href');
+            }
+            const getPermissionsNotifications = async ()=>{
+              if( navigator.permissions ){
+                  let result = await navigator.permissions.query({name : 'notifications'});
+                  return result.state;
+              }
+            }
+     
+            let currentNotification = await getPermissionsNotifications();
+
+            if ( currentNotification !== 'granted'){
+                deniedStyleBTN();
+            }
+
+
+            notificationBtn.addEventListener('click' ,  async function(e){
+              e.preventDefault();
+              if(!( 'serviceWorker' in navigator ) && !('pushManager' in window)){
+                console.log('push navigator error dare');
+                return ;
+              }
+              let result = await Notification.requestPermission();
+              if ( result !=='granted'){
+                deniedStyleBTN();
+                console.log('current not granted');
+                return;
+              }else{
+                new Notification('slm anisa' , {});
+                return ;
+              }
+
+            })
+            
         });
+
+        // Notification.requestPermission(function(status) {
+        //                   console.log('Notification permission status:', status);
+        //   });
     </script>    
 </body>
 </html>
